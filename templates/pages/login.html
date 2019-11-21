@@ -1,0 +1,76 @@
+{% extends 'pages/base.html' %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% block title %}登录{% endblock %}
+{% block content %}
+    <div>
+        <form action="/login" method="POST" class="col-md-4 col-md-offset-4"
+              data-need_bind_qywx="{{ need_bind_qywx }}">
+            {{ form.csrf_token }}
+            <h2 class="align-center">登录</h2>
+            <div class="form-group">
+                <label for="mobile-input">手机号</label>
+                <input type="number" name="mobile" class="form-control" id="mobile-input" placeholder="手机号">
+            </div>
+            <div class="form-group">
+                <label for="captcha-input">图形验证码</label>
+                <div class="clearfix">
+                    <div class="col-md-10" style="padding-left: 0">
+                        <input type="text" name="captcha" class="form-control" id="captcha-input" placeholder="图形验证码">
+                    </div>
+                    <div class="col-md-2" style="padding-right: 0">
+                        <img id="captcha-image" src="{{ url_for('get_captcha') }}" style="float: right">
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="verification-code-input">短信验证码</label>
+                <div class="clearfix">
+                    <div class="col-md-10" style="padding-left: 0">
+                        <input type="number" name="verification_code" class="form-control" id="verification-code-input"
+                               placeholder="短信验证码">
+                    </div>
+                    <div id="verification-code-action" class="col-md-2">获取验证码</div>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">登录</button>
+        </form>
+        <div id="qiye-wechat"></div>
+    </div>
+    <script src="http://rescdn.qqmail.com/node/ww/wwopenmng/js/sso/wwLogin-1.0.0.js"></script>
+    <script>
+        $(document).ready(function () {
+            window.WwLogin({
+                "id": "qiye-wechat",
+                "appid": "ww97c01ed9cb53cf7e",
+                "agentid": "1000002",
+                "redirect_uri": "http://chaser.ycy.qiujinwu.com/login",
+                "state": "qywxlogin"
+            });
+
+            if ($('form').data('need_bind_qywx') === 'True') {
+                alert('请先绑定账号');
+            }
+
+            $('#captcha-image').click(function () {
+                var captcha_url = $(this).attr("src").split("?")[0];
+                captcha_url += "?" + new Date().getTime();
+                $(this).attr("src", captcha_url);
+            });
+
+            $('#verification-code-action').click(function () {
+                $.ajax({
+                    url: '/get_verification_code',
+                    type: 'post',
+                    data: JSON.stringify({
+                        mobile: $('[name=mobile]').val() || null,
+                        captcha: $('[name=captcha]').val() || null
+                    }),
+                    contentType: 'application/json',
+                    success: function (result) {
+                            alert('验证码获取成功,您的验证码为: ' + result);
+                    }
+                });
+            });
+        });
+    </script>
+{% endblock %}

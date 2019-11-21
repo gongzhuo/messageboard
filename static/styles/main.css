@@ -1,0 +1,45 @@
+.clearfix {
+    overflow: auto;
+    zoom: 1;
+}
+
+.align-center {
+    text-align: center;
+}
+
+#verification-code-action {
+    cursor: pointer;
+    padding-left: 0;
+    padding-right: 0;
+    text-align: center;
+    color: #09b6f8;
+    line-height: 34px;
+}
+
+#message-board {
+    padding: 10px;
+}
+
+.red {
+    color: red;
+}
+
+.well {
+    position: relative;
+}
+
+.delete-message {
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+.update-message {
+    position: absolute;
+    top: 0;
+    right: 40px;
+}
+
+#create-message-form {
+    margin-top: 20px;
+}

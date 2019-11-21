@@ -1,0 +1,67 @@
+{% extends 'pages/base.html' %}
+{% block title %}留言板{% endblock %}
+{% block content %}
+    <div id="message-board">
+        <div class="clearfix">
+            <div class="col-md-10">
+                <h2>欢迎您，{% if name %}{{ name }}{% else %}Stranger{% endif %}!</h2>
+            </div>
+            <div class="col-md-2"><a href="/logout">【退出】</a></div>
+        </div>
+        {% if messages %}
+            {% for message in messages %}
+                <div class="well">
+                    <p style="font-size: 12px; color: #666">{{ message.author }} created at {{ message.time }}</p>
+                    <div class="content-wrapper">
+                        <p class="content">{{ message.content }}</p>
+                        <a href="javascript: void(0);" class="update-message" data-id="{{ message.id }}">修改</a>
+                        <a href="javascript: void(0);" class="red delete-message" data-id="{{ message.id }}">删除</a>
+                    </div>
+                    <form class="update-message-form form-horizontal hide" action="/messages_update/{{ message.id }}" method="post">
+                        {{ form.csrf_token }}
+                        <div class="form-group">
+                            <textarea name="message" class="form-control" rows="3">{{ message.content }}</textarea>
+                        </div>
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary">修改留言</button>
+                            <a class="back-edit" href="javascript: void(0);">撤销</a>
+                        </div>
+                    </form>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p class="red">当前还没有留言!</p>
+        {% endif %}
+        <form id="create-message-form" action="/message_submit" method="post" class="form-horizontal col-md-12">
+            {{ form.csrf_token }}
+            <div class="form-group">
+                <textarea name="message" class="form-control" rows="3"></textarea>
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">提交留言</button>
+            </div>
+        </form>
+    </div>
+    <script>
+        $(document).ready(function () {
+            $('.update-message').click(function () {
+                $(this).parents('.content-wrapper').addClass('hide');
+                $(this).parents('.well').find('.update-message-form').removeClass('hide');
+            });
+            $('.back-edit').click(function () {
+                $(this).parents('.update-message-form').addClass('hide');
+                $(this).parents('.well').find('.content-wrapper').removeClass('hide');
+            });
+            $('.delete-message').click(function () {
+                $.ajax({
+                    url: '/messages_delete/' + $(this).data('id'),
+                    method: 'DELETE',
+                    success: function (msg_id) {
+                        window.location.reload();
+                        alert("删除" + msg_id + "成功!")
+                    }
+                });
+            });
+        });
+    </script>
+{% endblock %}
